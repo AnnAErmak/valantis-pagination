@@ -1,16 +1,10 @@
 import React from 'react';
-
 import './App.css';
+import ProductList from './components/ProductList/ProductList';
 
 function App() {
-  return (
-    <div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+      return <ProductList/>
 
-  );
 }
 
 export default App;
