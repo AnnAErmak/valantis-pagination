@@ -1,0 +1,9 @@
+.list {
+    list-style: none;
+    font-family: 'Marck Script', cursive;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 800px;
+}
+

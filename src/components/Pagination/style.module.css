@@ -1,0 +1,25 @@
+.list{
+    display: flex;
+    list-style: none;
+    gap: 5px;
+    justify-content: center;
+}
+.item{
+    text-align: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    background: #3b3b3b;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color ease-in-out 0.5ms;
+}
+.item:hover{
+    background-color: #747bff;
+}
+.item.active{
+    background-color: #535bf2;
+}

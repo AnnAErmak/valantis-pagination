@@ -1,4 +1,5 @@
 import React from 'react';
+import style from './style.module.css'
 
 const Pagination = ({count, limit, page, indent, onChangePage}) => {
 
@@ -19,10 +20,9 @@ const Pagination = ({count, limit, page, indent, onChangePage}) => {
   if (right < length - 1) items.push(null);
   if (right < length) items.push(length);
   return (
-    <ul>
+    <ul className={style.list}>
       {items.map((number, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <li key={index} onClick={() => onChangePage(number)}>
+        <li className={`${style.item} ${number === page && style.active}`} key={index} onClick={() => onChangePage(number)}>
           {number || '...'}
         </li>
       ))}

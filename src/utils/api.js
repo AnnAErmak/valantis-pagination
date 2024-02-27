@@ -1,99 +1,65 @@
 import generatePassword from './generatePassword';
 import { BASE_URL, PAGINATION_LIMIT } from '../variables/variables';
+import removeDuplicates from './removeDuplicates.js';
 
-const apiResponse = async (params) => {
-  const res = await fetch(BASE_URL, params);
-  return res.json();
-};
-
-const apiBody = (data) => {
+const getData = async (body) => {
   const params = {
     method: 'POST',
     headers: {
       'X-Auth': generatePassword(),
       'Content-Type': 'application/json;charset=utf-8',
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(body),
   };
-  return params;
+  try {
+    const res = await fetch(BASE_URL, params);
+
+    if (!res.ok) {
+      throw new Error(res.status);
+    }
+    const data = await res.json();
+
+    return data.result;
+
+  } catch (err) {
+    console.log(err);
+    // await getData(body);
+  }
 };
 
-const getAllIds = async () => {
+const getIds = async (offset) => {
+  const params = offset >= 0 ? {
+    offset,
+    limit: PAGINATION_LIMIT,
+  } : null;
   const body = {
     action: 'get_ids',
+    params: params || {},
   };
-  const params = apiBody(body);
-  const ids = await apiResponse(params);
-  // const idsWithoutDuplicates = [...new Set(ids.result)];
-  // return idsWithoutDuplicates.length;
-  return ids.result.length;
+
+  const ids = await getData(body);
+
+  return ids;
 };
 
-const getIdsItem = async (activePage) => {
-  let offset = 0;
-  if (activePage > 1) offset = (activePage - 1) * 50;
+const getProductsByIds = async (ids) => {
+
   const body = {
-    action: 'get_ids',
-    params: {
-      offset,
-      limit: PAGINATION_LIMIT,
-    },
-  };
-  const params = apiBody(body);
-  const idsItem = await apiResponse(params);
-  const body2 = {
-    action: 'get_items',
-    params: { ids: idsItem.result },
-  };
-  const params2 = apiBody(body2);
-  const Items = await apiResponse(params2);
-
-  const items = Items.result;
-  const uniqueArray = items.filter((obj, index, arr) => index === arr.findIndex((o) => o.id === obj.id));
-  return uniqueArray;
-};
-
-const getFilteredProducts = async (filterParams) => {
-  const body = {
-    action: 'filter',
-    params: { [filterParams.options]: filterParams.value },
-  };
-
-  const params = apiBody(body)
-  const ids = await apiResponse(params)
-  const body2 = {
-    action: 'get_items',
-    params: { ids: ids.result },
-  };
-  const params2 = apiBody(body2);
-  const Items = await apiResponse(params2);
-  const items = Items.result;
-  const uniqueArray = items.filter((obj, index, arr) => index === arr.findIndex((o) => o.id === obj.id));
-  return uniqueArray;
-};
-
-const getFilteredIds = async (filterParams) => {
-  const body = {
-    action: 'filter',
-    params: { [filterParams.options]: filterParams.value },
-  };
-  const params = apiBody(body)
-  const ids = await apiResponse(params)
-  return ids.result
-}
-
-const getItems = async (ids) => {
-  const body2 = {
     action: 'get_items',
     params: { ids },
   };
+  const products = await getData(body);
+  const noTakes = removeDuplicates(products);
+  return noTakes;
+};
 
-  const params2 = apiBody(body2);
-  const Items = await apiResponse(params2);
-  const items = Items.result;
+const getIdsByFilter = async (filterParams) => {
+  const body = {
+    action: 'filter',
+    params: { [filterParams.options]: filterParams.value },
+  };
+  const products = await getData(body);
+  return products;
+};
 
-  const uniqueArray = items.filter((obj, index, arr) => index === arr.findIndex((o) => o.id === obj.id));
-  return uniqueArray;
-}
-
-export { getAllIds, getIdsItem, getFilteredProducts, getFilteredIds, getItems };
+export { getIds, getProductsByIds, getIdsByFilter };
