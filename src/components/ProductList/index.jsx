@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import ProductItem from '../ProductItem/ProdtItem';
-import Filter from '../Filter/Filter';
-import Pagination from '../Pagination/Pagination';
+import ProductItem from '../ProductItem';
+import Filter from '../Filter';
+import Pagination from '../Pagination';
 import {
   getIds, getIdsByFilter, getProductsByIds,
 } from '../../utils/api';
 import { PAGINATION_LIMIT } from '../../variables/variables';
-import Loader from '../Loader/Loader';
-import styles from './style.module.css'
-
+import Loader from '../Loader';
+import styles from './style.module.css';
 
 function ProductList() {
   const [countAllIds, setCountAllIds] = useState(0);
@@ -32,10 +31,10 @@ function ProductList() {
       const productActive = await getIds(0);
       const productValue = await getProductsByIds(productActive);
       setProducts(productValue);
+      setIsLoader(false);
     };
 
-    ids()
-      .then(() => setIsLoader(false));
+    ids();
   }, []);
 
   useEffect(() => {
@@ -45,6 +44,7 @@ function ProductList() {
       const productActive = await getIds((activePage - 1) * PAGINATION_LIMIT);
       const productValue = await getProductsByIds(productActive);
       setProducts(productValue);
+      setIsLoader(false);
     };
 
     if (isFilter) {
@@ -52,42 +52,62 @@ function ProductList() {
         const productActive = filteredIds.slice((activePage - 1) * 50, activePage * 50);
         const productValue = await getProductsByIds(productActive);
         setProducts(productValue);
+        setIsLoader(false);
       };
-      productByIds()
-        .then(() => setIsLoader(false));
+      productByIds();
     }
 
     if (!isFilter) {
-      ids()
-        .then(() => setIsLoader(false));
+      ids();
     }
   }, [activePage]);
 
   useEffect(() => {
-    setIsLoader(true);
 
-    const filtIds = async () => {
-      const ids = await getIdsByFilter(filterParams);
-      if (!ids) return;
-      setFilteredIds(ids);
-      setCountFilterIds(ids.length);
-    };
+    if (isFilter){
+      setIsLoader(true);
+      const filtIds = async () => {
+        const ids = await getIdsByFilter(filterParams);
+        if (!ids) return;
+        setFilteredIds(ids);
+        setCountFilterIds(ids.length);
+        setIsLoader(false);
+      };
 
-    filtIds()
-      .then(() => setIsLoader(false));
+      filtIds();
+    }
+
   }, [filterParams]);
 
   useEffect(() => {
+
     if (isFilter) {
+      setIsLoader(true);
+      setActivePage(1);
       const filter = async () => {
         const activeIds = filteredIds.slice(0, 50);
         const activeProducts = await getProductsByIds(activeIds);
         setProducts(activeProducts);
+        setIsLoader(false);
       };
-      filter()
-        .then(() => setIsLoader(false));
+      filter();
     }
   }, [filteredIds]);
+
+  useEffect(() => {
+    if (!isFilter) {
+      setIsLoader(true);
+
+      const ids = async () => {
+        const productActive = await getIds(0);
+        const productValue = await getProductsByIds(productActive);
+        setProducts(productValue);
+        setIsLoader(false);
+      };
+
+      ids();
+    }
+  }, [isFilter]);
 
   const onChangePage = (numberPage) => {
     if (numberPage) setActivePage(numberPage);
@@ -100,6 +120,7 @@ function ProductList() {
       options,
     });
   };
+
   const resetFilter = () => {
     setIsFilter(false);
   };
@@ -130,8 +151,8 @@ function ProductList() {
         onChangePage={onChangePage}
       />
 
-      {isFilter && filteredIds.length === 0 &&
-        <p>Товаров с такой характеристикой нет. Попробуйте найти по другим параметрам!</p>}
+      {isFilter && filteredIds.length === 0
+        && <p>Товаров с такой характеристикой нет. Попробуйте найти по другим параметрам!</p>}
 
     </Loader>
 

@@ -66,3 +66,8 @@
     color: #ec7263;
     cursor: pointer;
 }
+.disable{
+    cursor: none;
+    pointer-events: none;
+    fill: #888888;
+}

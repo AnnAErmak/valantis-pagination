@@ -67,7 +67,7 @@ function Filter({ onChangeFilter, resetFilter }) {
       <div className={styles.wrapperSearch}>
         <input className={styles.inputSearch} type="text" value={valueSearch} placeholder="Поиск..."
                onChange={(e) => onChangeSearch(e.target.value)}/>
-        <IoSearchSharp className={styles.iconSearch} style={{ color: 'white' }}
+        <IoSearchSharp className={`${styles.iconSearch} ${!valueSearch && styles.disable}`}
                        onClick={() => handlerClick(selectedOption, valueSearch)}/>
         <IoCloseSharp className={styles.iconClose}
                       onClick={handlerClickClose}

@@ -1,6 +1,6 @@
 import generatePassword from './generatePassword';
 import { BASE_URL, PAGINATION_LIMIT } from '../variables/variables';
-import removeDuplicates from './removeDuplicates.js';
+import removeDuplicates from './removeDuplicates';
 
 const getData = async (body) => {
   const params = {
